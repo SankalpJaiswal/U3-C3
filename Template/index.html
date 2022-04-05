@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+
+      #main{
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+      }
+
+      img{
+        height: 250px;
+      }
+
+
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h3 id="wallet">
+        <!--SHOW CURRENT WALLET VALUE HERE, ONLY THE NUMBER SHOULD BE VISIBLE-->
+      </h3>
+    </div>
+
+    <div id="main">
+      <!--SHOW ALL THE VOUCEHRS DATA FROM API HERE( IMAGE, NAME AND PRICE)-->
+    </div>
+  </body>
+</html>
+
+<script type="module">
+  //WRITE YOUR LOGIC 
+  
+  let cart = JSON.parse(localStorage.getItem("purchases")) || [];
+
+  let amount = JSON.parse(localStorage.getItem("wallet"));
+
+  document.querySelector("#wallet").append(amount);
+
+  let url = `https://masai-vouchers-api.herokuapp.com/api/vouchers`;
+
+  async function products(){
+
+    try{
+      let res = await fetch(url);
+      let data = await res.json();
+
+      console.log(data[0]);
+      // console.log(data[0].vouchers[0].name)
+
+      append(data[0].vouchers);
+    }
+
+    catch(err){
+      console.log('err:', err)
+    }
+  }
+
+  products();
+
+  function append(data){
+
+    data.forEach(function(elem){
+
+      let div = document.createElement("div")
+
+      let img = document.createElement("img");
+      img.src = elem.image;
+
+      let title = document.createElement("h3");
+      title.innerText = elem.name;
+
+      let rate = document.createElement("h5");
+      rate.innerText = elem.price;
+
+      let btn = document.createElement("button");
+      btn.innerText = "Buy";
+      btn.setAttribute("id","buy")
+      btn.addEventListener("click", function(){
+        buy(elem);
+      })
+
+      div.append(img,title,rate,btn);
+      document.querySelector("#main").append(div);
+      
+    });
+
+    function buy(elem){
+
+    if(amount>=elem.price)
+    {
+      console.log(elem);
+
+      cart.push(elem);
+      console.log(cart)
+
+      localStorage.setItem("purchases",JSON.stringify(cart));
+
+    }
+
+    
+  }
+
+
+  }
+
+
+</script>
